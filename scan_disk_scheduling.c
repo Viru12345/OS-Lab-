@@ -1,98 +1,105 @@
 #include<stdio.h>
-#include<stdlib.h>
-int main()
+int absoluteValue(int); 
+
+void main()
 {
-    int RQ[100],i,j,n,TotalHeadMoment=0,initial,size,move;
-    printf("Enter the number of Requests\n");
+    int queue[25],n,headposition,i,j,k,seek=0, maxrange,
+    difference,temp,queue1[20],queue2[20],temp1=0,temp2=0;
+    float averageSeekTime;
+    printf("Enter the maximum range of Disk: ");
+    scanf("%d",&maxrange);
+    
+    printf("Enter the number of queue requests: ");
     scanf("%d",&n);
-    printf("Enter the Requests sequence\n");
-    for(i=0;i<n;i++)
-     scanf("%d",&RQ[i]);
-    printf("Enter initial head position\n");
-    scanf("%d",&initial);
-    printf("Enter total disk size\n");
-    scanf("%d",&size);
-    printf("Enter the head movement direction for high 1 and for low 0\n");
-    scanf("%d",&move);
     
-    // logic for Scan disk scheduling
+    printf("Enter the initial head position: ");
+    scanf("%d",&headposition);
     
-        /*logic for sort the request array */
-    for(i=0;i<n;i++)
+    printf("Enter the disk positions to be read(queue): ");
+    for(i=1;i<=n;i++)   
     {
-        for(j=0;j<n-i-1;j++)
+        scanf("%d",&temp);  
+        if(temp>headposition)
         {
-            if(RQ[j]>RQ[j+1])
+            queue1[temp1]=temp; 
+            temp1++; 
+        }
+        else   
+        {   
+            queue2[temp2]=temp; 
+            temp2++;
+        }
+    }
+    
+    for(i=0;i<temp1-1;i++)
+    {
+        for(j=i+1;j<temp1;j++)
+        {
+            if(queue1[i]>queue1[j])
             {
-                int temp;
-                temp=RQ[j];
-                RQ[j]=RQ[j+1];
-                RQ[j+1]=temp;
+                temp=queue1[i];
+                queue1[i]=queue1[j];
+                queue1[j]=temp;
             }
-
         }
     }
-
-    int index;
-    for(i=0;i<n;i++)
+    
+    for(i=0;i<temp2-1;i++)
     {
-        if(initial<RQ[i])
+        for(j=i+1;j<temp2;j++)
         {
-            index=i;
-            break;
+            if(queue2[i]<queue2[j])
+            {
+                temp=queue2[i];
+                queue2[i]=queue2[j];
+                queue2[j]=temp;
+            }
         }
-    }
-   
-    // if movement is towards high value
-    if(move==1)
+    }    
+    
+    for(i=1,j=0;j<temp1;i++,j++)
     {
-        for(i=index;i<n;i++)
-        {
-            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
-            initial=RQ[i];
-        }
-        //  last movement for max size 
-        TotalHeadMoment=TotalHeadMoment+abs(size-RQ[i-1]-1);
-        initial = size-1;
-        for(i=index-1;i>=0;i--)
-        {
-             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
-             initial=RQ[i];
-            
-        }
+        queue[i]=queue1[j]; 
     }
-    // if movement is towards low value
+    
+    queue[i]=maxrange;
+    
+    for(i=temp1+2,j=0;j<temp2;i++,j++)
+    {
+        queue[i]=queue2[j];
+    }
+    
+    queue[i]=0;
+
+ 
+    queue[0]=headposition;
+    
+    
+    for(j=0; j<=n; j++) 
+    {   
+        difference = absoluteValue(queue[j+1]-queue[j]);
+        
+        seek = seek + difference;
+        
+        printf("Disk head moves from position %d to %d with Seek %d \n", queue[j], queue[j+1], difference);
+    }
+    
+    averageSeekTime = seek/(float)n;
+    
+    printf("Total Seek Time= %d\n", seek);
+    printf("Average Seek Time= %f\n", averageSeekTime);
+}
+
+int absoluteValue(int x)
+{
+    if(x>0)
+    {
+        return x;
+    }
     else
     {
-        for(i=index-1;i>=0;i--)
-        {
-            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
-            initial=RQ[i];
-        }
-        //  last movement for min size 
-        TotalHeadMoment=TotalHeadMoment+abs(RQ[i+1]-0);
-        initial =0;
-        for(i=index;i<n;i++)
-        {
-             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
-             initial=RQ[i];
-            
-        }
+        return x*-1;
     }
-    
-    printf("Total head movement is %d",TotalHeadMoment);
-    return 0;
 }
-Output:-
 
-Enter the number of Request
-8
-Enter the Requests Sequence
-95 180 34 119 11 123 62 64
-Enter initial head position
-50
-Enter total disk size
-200
-Enter the head movement direction for high 1 and for low 0
-1
-Total head movement is 337
+
